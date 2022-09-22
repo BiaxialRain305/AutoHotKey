@@ -1,11 +1,11 @@
-﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 #SingleInstance Force
-SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+SendMode Event  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 CoordMode Pixel, Client ; Recommended
 SetTitleMatchMode 2
 DetectHiddenWindows, On
-
+SetKeyDelay, 25
 gosub makeGUI
 Gui, Show, Autosize
 
@@ -49,7 +49,7 @@ _::
 				{
 					Random, randlag, 1.6, 1.7
 					randlag := randlag * 1000 + 500
-					SendInput $%rolltype% {ENTER}
+					Send $%rolltype% {ENTER}
 					Sleep %randlag%
 
 					if (A_Min <= Setinterval-1) 
@@ -73,25 +73,26 @@ _::
 			Random, randlag, 1000.0, 1300.0
 			if (counter == 0)
 			{
-				send /%rolltype% {ENTER}
+				Send, /%rolltype%{Space}
+				Sleep, 250
+				Send, {enter}
 				counter++
 				
 			} 
 			else if (counter == 1)
 			{
-				sendInput {AltDown}{Down}{AltUp}
+				Send {AltDown}{Down}{AltUp}
 				sleep 500
-				sendInput $%rolltype% {ENTER}
+				send $%rolltype% {ENTER}
 				sleep %randlag%
 				counter++
 			}
 			else if (counter == 2)
 			{
-				sendInput $%rolltype% {ENTER}
+				send $%rolltype% {ENTER}
 				sleep 100
-				sendInput {AltDown}{Up}{AltUp}
+				Send {AltDown}{Up}{AltUp}
 				sleep 1100
-				
 				counter := 0
 			}
 		}
@@ -102,18 +103,22 @@ _::
 			randlag := randlag * 1000
 			if (counter == 4) 
 			{
-				send /%rolltype% {ENTER}
+				Send, /%rolltype%{Space}
+				Sleep, 250
+				Send, {enter}
 				randlag += 200
 				sleep %randlag%
 			} 
 			else if (counter == 5) 
 			{
-				send /%rolltype% {ENTER}
+				Send, /%rolltype%{Space}
+				Sleep, 250
+				Send, {enter}
 				randlag += 180
 				sleep %randlag%
 				counter := 0
 			} else {
-				sendInput $%rolltype% {ENTER}
+				Send $%rolltype% {ENTER}
 				randlag += 110
 				sleep %randlag%
 			}
@@ -126,11 +131,13 @@ _::
 			Random, randlag, 1300.0, 1500.0
 			if (counter != 2) ; reliable for lag 
 			{
-				sendInput $%rolltype% {ENTER}
+				Send $%rolltype% {ENTER}
 			} 
 			else
 			{
-				send /%rolltype% {ENTER}
+				Send, /%rolltype%{Space}
+				Sleep, 250
+				Send, {enter}
 				counter := 0
 			}
 			sleep %randlag%
@@ -143,17 +150,19 @@ _::
 			Random, randlag, 1200.0, 1400.0
 			if (counter == 0)
 			{
-				send /%rolltype% {ENTER}
+				Send, /%rolltype%{Space}
+				Sleep, 250
+				Send, {enter}
 				send {AltDown}{Down}{AltUp} 
 				counter++
 				sleep 500
 			} 
 			else if (counter == 1)
 			{
-				sendinput $%rolltype% {ENTER}
+				send $%rolltype% {ENTER}
 				gosub rollCheck
 				sleep %randlag%
-				sendinput $%rolltype% {ENTER}{AltDown}{Up}{AltUp}
+				send $%rolltype% {ENTER}{AltDown}{Up}{AltUp}
 				counter := 0
 				sleep %randlag%
 			}
@@ -167,19 +176,22 @@ _::
 			if (counter == 2) 
 			{
 				counter := 0
-				send /%rolltype% {ENTER}
+				Send, /%rolltype%{Space}
+				Sleep, 250
+				Send, {enter}
 				randlag += 200
 			} 
 			else if (counter == 0) 
 			{
-				send /%rolltype% {ENTER}
+				Send, /%rolltype%{Space}
+				Sleep, 350
+				Send, {enter}
 				randlag += 200
 				
 			} else {
-				sendInput $%rolltype% {ENTER}
+				Send, $%rolltype%{ENTER}
 				randlag += 100
 			}
-			send ^a
 			sleep %randlag%
 			counter++
 		}
@@ -189,13 +201,13 @@ _::
 	
 	rollCheck:
 		
-		if (us &&  A_Min < Setinterval-1)
+		if (us && A_Min < Setinterval-1)
 		{
 			Pixelsearch, px, py, 733, 735, 792, 886, 0x8B343B, 10, Fast
 			if (!ErrorLevel) 
 			{
 				Sleep 200
-				SendInput $us 20 {ENTER}
+				Send, $us 20 {ENTER}
 				Sleep 700
 			}	
 		}
@@ -222,11 +234,11 @@ makeGUI:
 	Gui, Add, UpDown, gCheckoptions vSetinterval Range0-60, 60 (Default)
 	Gui, Add, CheckBox, vus checked, Sends $us 20 after normal rolls (Doesn't waste unnecessary $us rolls)
 	
-	Gui, Add, Radio, gCheckoptions checked vDoubleChannel, Fastest Double Channel (Fastest)
+	Gui, Add, Radio, gCheckoptions vDoubleChannel, Fastest Double Channel (Fastest)
 	Gui, Add, Radio, gCheckoptions vFastest, Fastest (3 $, 2 /)
 	Gui, Add, Radio, gCheckoptions vFaster, Faster (2 $, 1 /)
 	Gui, Add, Radio, gCheckoptions vFast, Fast (1 $, 3 /)
-	Gui, Add, Radio, gCheckoptions vAlternate, Alternate (1 $, 1 /)
+	Gui, Add, Radio, gCheckoptions checked vAlternate, Alternate (1 $, 1 /)
 	
 	Gui, add, text,, Roll Type?
 	Gui, Add, DropDownList, groll_type r4 vrolltype Choose1, wa|ha|wg|hg
